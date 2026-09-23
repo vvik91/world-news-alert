@@ -18,6 +18,9 @@ export class AlertStateService {
   // Read-only computed signals
   readonly alerts = this._alerts.asReadonly();
   readonly globalAlertCreationEnabled = this._globalAlertCreationEnabled.asReadonly();
+
+  // Public read-only signal for UI consumers
+  readonly eventTypes = this._eventTypes.asReadonly();
   
   readonly channels = computed<NotificationChannel[]>(() => 
     Array.from(this._handlers().values()).map(h => h.channelInfo)

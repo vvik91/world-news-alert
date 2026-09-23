@@ -1,0 +1,111 @@
+<div class="dashboard-container">
+  <!-- Header -->
+  <div class="dashboard-header">
+    <h2>World Events & Breaking News Alerts</h2>
+  </div>
+
+  <!-- Filters Toolbar -->
+  <mat-card class="filter-card">
+    <mat-card-content class="filter-controls">
+      
+      <!-- Status Filter -->
+      <mat-form-field appearance="outline">
+        <mat-label>Status</mat-label>
+        <mat-select [ngModel]="selectedStatus()" (ngModelChange)="selectedStatus.set($event); pageIndex.set(0)">
+          <mat-option value="all">All</mat-option>
+          <mat-option value="active">Active</mat-option>
+          <mat-option value="inactive">Inactive</mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <!-- Event Type Filter -->
+      <mat-form-field appearance="outline">
+        <mat-label>Event Type</mat-label>
+        <mat-select [ngModel]="selectedEventType()" (ngModelChange)="selectedEventType.set($event); pageIndex.set(0)">
+          <mat-option value="all">All Event Types</mat-option>
+          @for (type of eventTypes(); track type.id) {
+            <mat-option [value]="type.id">{{ type.label }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+
+      <!-- Date Filter -->
+      <mat-form-field appearance="outline">
+        <mat-label>Filter Date</mat-label>
+        <input matInput [matDatepicker]="picker" [ngModel]="selectedDate()" (ngModelChange)="selectedDate.set($event); pageIndex.set(0)">
+        <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+        <mat-datepicker #picker></mat-datepicker>
+      </mat-form-field>
+
+      <button mat-stroked-button (click)="clearDateFilter()">
+        <mat-icon>today</mat-icon> Reset to Today
+      </button>
+
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Alerts Expandable List -->
+  @if (paginatedAlerts().length > 0) {
+    <mat-accordion class="alert-accordion" multi>
+      @for (alert of paginatedAlerts(); track alert.id) {
+        <mat-expansion-panel>
+          <mat-expansion-panel-header>
+            <mat-panel-title class="alert-title">
+              <span class="status-indicator" [class.active]="alert.status === 'active'"></span>
+              <strong>{{ alert.title }}</strong>
+            </mat-panel-title>
+            
+            <mat-panel-description class="alert-meta">
+              <mat-chip-option disabled class="type-chip">
+                {{ getEventTypeLabel(alert.eventType) }}
+              </mat-chip-option>
+              <span class="timestamp">{{ alert.createdAt | date:'short' }}</span>
+
+              <!-- Quick Item Actions -->
+              <div class="panel-actions">
+                <button mat-icon-button [color]="alert.status === 'active' ? 'accent' : 'warn'"
+                        (click)="toggleAlertStatus(alert.id, $event)"
+                        [attr.title]="alert.status === 'active' ? 'Deactivate' : 'Activate'">
+                  <mat-icon>{{ alert.status === 'active' ? 'pause_circle' : 'play_circle' }}</mat-icon>
+                </button>
+
+                <button mat-icon-button color="warn" (click)="deleteAlert(alert.id, $event)" title="Delete Alert">
+                  <mat-icon>delete</mat-icon>
+                </button>
+              </div>
+            </mat-panel-description>
+          </mat-expansion-panel-header>
+
+          <!-- Expanded Body Content -->
+          <div class="expanded-body">
+            <p class="description">{{ alert.description }}</p>
+            
+            <div class="channel-badges">
+              <small>Dispatched Channels:</small>
+              @for (channelId of alert.channels; track channelId) {
+                <span class="channel-tag">
+                  <mat-icon>notifications</mat-icon> {{ channelId }}
+                </span>
+              }
+            </div>
+          </div>
+        </mat-expansion-panel>
+      }
+    </mat-accordion>
+  } @else {
+    <div class="empty-state">
+      <mat-icon>notifications_off</mat-icon>
+      <p>No alerts match your current filter criteria.</p>
+    </div>
+  }
+
+  <!-- Paginator -->
+  <mat-paginator
+    [length]="filteredAlerts().length"
+    [pageSize]="pageSize()"
+    [pageIndex]="pageIndex()"
+    [pageSizeOptions]="pageSizeOptions"
+    (page)="onPageChange($event)"
+    showFirstLastButtons>
+  </mat-paginator>
+</div>
