@@ -1,0 +1,54 @@
+<h2 mat-dialog-title>Create New Alert</h2>
+
+<mat-dialog-content class="dialog-content">
+  <mat-form-field appearance="outline">
+    <mat-label>Alert Title</mat-label>
+    <input matInput [(ngModel)]="title" placeholder="e.g. Major Market Shift Detected" required />
+  </mat-form-field>
+
+  <mat-form-field appearance="outline">
+    <mat-label>Description</mat-label>
+    <textarea matInput [(ngModel)]="description" rows="3" placeholder="Provide detailed context..."></textarea>
+  </mat-form-field>
+
+  <!-- Event Type Selection + Dynamic Addition -->
+  <div class="event-type-row">
+    <mat-form-field appearance="outline" class="flex-grow">
+      <mat-label>Event Type</mat-label>
+      <mat-select [(ngModel)]="selectedEventType">
+        @for (type of stateService.eventTypes(); track type.id) {
+          <mat-option [value]="type.id">{{ type.label }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+
+    <div class="custom-type-box">
+      <input #newTypeInput type="text" placeholder="Add custom type..." class="type-input" />
+      <button mat-icon-button color="primary" type="button" (click)="addCustomType(newTypeInput.value); newTypeInput.value = ''">
+        <mat-icon>add</mat-icon>
+      </button>
+    </div>
+  </div>
+
+  <!-- Channel Dispatch Selection -->
+  <div class="channels-selection">
+    <label><strong>Dispatch Channels:</strong></label>
+    <div class="checkbox-group">
+      @for (channel of stateService.channels(); track channel.id) {
+        <mat-checkbox 
+          [checked]="selectedChannels.includes(channel.id)"
+          [disabled]="!channel.enabled"
+          (change)="toggleChannel(channel.id, $event.checked)">
+          {{ channel.name }} @if(!channel.enabled) { <small>(Disabled)</small> }
+        </mat-checkbox>
+      }
+    </div>
+  </div>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button mat-dialog-close>Cancel</button>
+  <button mat-raised-button color="primary" [disabled]="!isValid()" (click)="submitAlert()">
+    Create & Dispatch
+  </button>
+</mat-dialog-actions>

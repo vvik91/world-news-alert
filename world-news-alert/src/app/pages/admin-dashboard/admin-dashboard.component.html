@@ -1,0 +1,178 @@
+<div class="admin-container">
+  <!-- Top Admin Controls Header -->
+  <div class="admin-header">
+    <div>
+      <h2>Admin Control Center</h2>
+      <p class="subtitle">Global Alert System & Dispatch Channel Governance</p>
+    </div>
+
+    <div class="action-buttons">
+      <button mat-raised-button color="accent" (click)="openAddChannelModal()">
+        <mat-icon>add_link</mat-icon> Add Channel
+      </button>
+
+      <button mat-raised-button color="primary" 
+              [disabled]="!stateService.globalAlertCreationEnabled()" 
+              (click)="openCreateModal()">
+        <mat-icon>add_alert</mat-icon> Create Alert
+      </button>
+    </div>
+  </div>
+
+  <!-- Global Admin Filters Bar -->
+  <mat-card class="admin-filter-card">
+    <mat-card-content class="filter-row">
+      <!-- Global Date Picker -->
+      <mat-form-field appearance="outline">
+        <mat-label>Global Admin Date</mat-label>
+        <input matInput [matDatepicker]="adminPicker" [ngModel]="selectedDate()" (ngModelChange)="selectedDate.set($event); pageIndex.set(0)">
+        <mat-datepicker-toggle matIconSuffix [for]="adminPicker"></mat-datepicker-toggle>
+        <mat-datepicker #adminPicker></mat-datepicker>
+      </mat-form-field>
+
+      <!-- Global Dispatch Status Filter -->
+      <mat-form-field appearance="outline">
+        <mat-label>Dispatch Log Status</mat-label>
+        <mat-select [ngModel]="selectedDispatchStatus()" (ngModelChange)="selectedDispatchStatus.set($event); pageIndex.set(0)">
+          <mat-option value="all">All Dispatch Outcomes</mat-option>
+          <mat-option value="success">Success</mat-option>
+          <mat-option value="failed">Failed</mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <button mat-button (click)="selectedDate.set(new Date())">
+        <mat-icon>today</mat-icon> Reset Date
+      </button>
+    </mat-card-content>
+  </mat-card>
+
+  <mat-tab-group animationDuration="0ms">
+    
+    <!-- TAB 1: Alert Management & Dispatch Log Dashboard -->
+    <mat-tab label="Alerts Dashboard">
+      <div class="tab-content">
+        @if (paginatedAlerts().length > 0) {
+          <mat-accordion class="alert-accordion" multi>
+            @for (alert of paginatedAlerts(); track alert.id) {
+              <mat-expansion-panel>
+                <mat-expansion-panel-header>
+                  <mat-panel-title class="alert-title">
+                    <span class="status-indicator" [class.active]="alert.status === 'active'"></span>
+                    <strong>{{ alert.title }}</strong>
+                  </mat-panel-title>
+
+                  <mat-panel-description class="alert-meta">
+                    <mat-chip-option disabled>{{ getEventTypeLabel(alert.eventType) }}</mat-chip-option>
+                    <span class="timestamp">{{ alert.createdAt | date:'short' }}</span>
+
+                    <div class="panel-actions">
+                      <button mat-icon-button [color]="alert.status === 'active' ? 'accent' : 'warn'"
+                              (click)="toggleAlertStatus(alert.id, $event)"
+                              [attr.title]="alert.status === 'active' ? 'Deactivate' : 'Activate'">
+                        <mat-icon>{{ alert.status === 'active' ? 'pause_circle' : 'play_circle' }}</mat-icon>
+                      </button>
+
+                      <button mat-icon-button color="warn" (click)="deleteAlert(alert.id, $event)" title="Delete Alert">
+                        <mat-icon>delete</mat-icon>
+                      </button>
+                    </div>
+                  </mat-panel-description>
+                </mat-expansion-panel-header>
+
+                <!-- Expanded Content & Log Details -->
+                <div class="expanded-body">
+                  <p class="description">{{ alert.description }}</p>
+
+                  <div class="dispatch-log-section">
+                    <h4>Channel Dispatch Audit Trail:</h4>
+                    @if (alert.dispatchLogs.length > 0) {
+                      <ul class="log-list">
+                        @for (log of alert.dispatchLogs; track log.channelId) {
+                          <li [class.success]="log.status === 'success'" [class.failed]="log.status === 'failed'">
+                            <mat-icon>{{ log.status === 'success' ? 'check_circle' : 'error' }}</mat-icon>
+                            <strong>{{ log.channelId }}</strong> — {{ log.status | uppercase }} 
+                            <small>({{ log.timestamp | date:'mediumTime' }})</small>
+                            @if (log.errorMessage) {
+                              <span class="error-msg">- {{ log.errorMessage }}</span>
+                            }
+                          </li>
+                        }
+                      </ul>
+                    } @else {
+                      <p class="no-logs">No channel dispatches logged for this alert.</p>
+                    }
+                  </div>
+                </div>
+              </mat-expansion-panel>
+            }
+          </mat-accordion>
+        } @else {
+          <div class="empty-state">
+            <mat-icon>folder_off</mat-icon>
+            <p>No alerts match the active global admin filters.</p>
+          </div>
+        }
+
+        <mat-paginator
+          [length]="filteredAlerts().length"
+          [pageSize]="pageSize()"
+          [pageIndex]="pageIndex()"
+          [pageSizeOptions]="pageSizeOptions"
+          (page)="onPageChange($event)"
+          showFirstLastButtons>
+        </mat-paginator>
+      </div>
+    </mat-tab>
+
+    <!-- TAB 2: Channel & System Governance -->
+    <mat-tab label="Channel & Creation Settings">
+      <div class="tab-content settings-grid">
+        
+        <!-- Global Toggle Settings -->
+        <mat-card class="setting-card">
+          <mat-card-header>
+            <mat-card-title>Global Alert Generation</mat-card-title>
+          </mat-card-header>
+          <mat-card-content class="setting-body">
+            <p>Enable or pause alert creation system-wide across all user and admin views.</p>
+            <mat-slide-toggle
+              color="primary"
+              [checked]="stateService.globalAlertCreationEnabled()"
+              (change)="toggleGlobalCreation($event.checked)">
+              Global Alert Creation Allowed
+            </mat-slide-toggle>
+          </mat-card-content>
+        </mat-card>
+
+        <!-- Individual Channel Governance -->
+        <mat-card class="setting-card">
+          <mat-card-header>
+            <mat-card-title>Channel Status Controls</mat-card-title>
+          </mat-card-header>
+          <mat-card-content class="setting-body">
+            <p>Disable individual channels to temporarily block dispatches without deleting configured integrations.</p>
+            <div class="channel-toggle-list">
+              @for (channel of stateService.channels(); track channel.id) {
+                <div class="channel-toggle-row">
+                  <div class="channel-info">
+                    <mat-icon>{{ channel.icon }}</mat-icon>
+                    <strong>{{ channel.name }}</strong> <code>({{ channel.id }})</code>
+                  </div>
+
+                  <mat-slide-toggle
+                    color="accent"
+                    [checked]="channel.enabled"
+                    (change)="toggleChannelStatus(channel.id, $event.checked)">
+                    {{ channel.enabled ? 'Active' : 'Disabled' }}
+                  </mat-slide-toggle>
+                </div>
+              }
+            </div>
+          </mat-card-content>
+        </mat-card>
+
+      </div>
+    </mat-tab>
+
+  </mat-tab-group>
+</div>

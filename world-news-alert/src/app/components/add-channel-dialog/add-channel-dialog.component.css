@@ -1,0 +1,11 @@
+:host {
+  display: block;
+
+  .dialog-content {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    min-width: 360px;
+    padding-top: 12px;
+  }
+}

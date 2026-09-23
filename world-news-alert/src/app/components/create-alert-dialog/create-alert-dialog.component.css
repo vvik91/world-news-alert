@@ -1,0 +1,50 @@
+:host {
+  display: block;
+
+  .dialog-content {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    min-width: 420px;
+    padding-top: 12px;
+  }
+
+  .event-type-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+
+    .flex-grow {
+      flex: 1;
+    }
+  }
+
+  .custom-type-box {
+    display: flex;
+    align-items: center;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    padding: 2px 4px;
+    margin-top: 4px;
+
+    .type-input {
+      border: none;
+      outline: none;
+      width: 120px;
+      padding: 4px;
+    }
+  }
+
+  .channels-selection {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 8px;
+
+    .checkbox-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+  }
+}

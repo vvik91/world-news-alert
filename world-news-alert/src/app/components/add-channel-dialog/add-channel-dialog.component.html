@@ -1,0 +1,25 @@
+<h2 mat-dialog-title>Add New Notification Channel</h2>
+
+<mat-dialog-content class="dialog-content">
+  <mat-form-field appearance="outline">
+    <mat-label>Channel ID</mat-label>
+    <input matInput [(ngModel)]="channelId" placeholder="e.g. ms-teams, webhook, sms" required />
+  </mat-form-field>
+
+  <mat-form-field appearance="outline">
+    <mat-label>Channel Name</mat-label>
+    <input matInput [(ngModel)]="channelName" placeholder="e.g. Microsoft Teams" required />
+  </mat-form-field>
+
+  <mat-form-field appearance="outline">
+    <mat-label>Material Icon Name</mat-label>
+    <input matInput [(ngModel)]="icon" placeholder="e.g. chat, send, mark_email_unread" />
+  </mat-form-field>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button mat-dialog-close>Cancel</button>
+  <button mat-raised-button color="primary" [disabled]="!isValid()" (click)="addChannel()">
+    Register Channel
+  </button>
+</mat-dialog-actions>
