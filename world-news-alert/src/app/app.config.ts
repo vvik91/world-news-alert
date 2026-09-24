@@ -1,5 +1,6 @@
-import { ApplicationConfig, provideAppInitializer, provideBrowserGlobalErrorListeners, inject } from '@angular/core';
-import { provideRouter } from '@angular/router';
+import { ApplicationConfig, provideAppInitializer, provideBrowserGlobalErrorListeners, inject, provideZoneChangeDetection } from '@angular/core';
+import { provideRouter, withComponentInputBinding } from '@angular/router';
+import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import { routes } from './app.routes';
 
 import { MockDataEngineService } from './services/mock-data-engine.service';
@@ -14,11 +15,12 @@ export function initializeMockEngine(mockEngine: MockDataEngineService) {
 export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
-    provideRouter(routes),
+    provideRouter(routes, withComponentInputBinding()),
+    provideAnimationsAsync(),
     provideAppInitializer(() => {
       const mockEngine = inject(MockDataEngineService);
-      // MockDataEngineService seeds data in its constructor upon injection.
-      // mockEngine.startSimulation(20000);
+      //MockDataEngineService seeds data in its constructor upon injection.
+      mockEngine.startSimulation(20000);
     })
   ]
 };

@@ -14,6 +14,7 @@ import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatCardModule } from '@angular/material/card';
+import { MatInputModule } from '@angular/material/input';
 
 import { AlertStateService } from '../../services/alert-state.service';
 import { Alert, AlertStatus } from '../../models/alert.model';
@@ -34,7 +35,8 @@ import { Alert, AlertStatus } from '../../models/alert.model';
     MatPaginatorModule,
     MatChipsModule,
     MatSlideToggleModule,
-    MatCardModule
+    MatCardModule,
+    MatInputModule,
   ],
   templateUrl: './user-dashboard.component.html',
   styleUrl: './user-dashboard.component.css'

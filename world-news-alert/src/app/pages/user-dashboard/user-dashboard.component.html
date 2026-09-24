@@ -37,7 +37,7 @@
         <mat-datepicker #picker></mat-datepicker>
       </mat-form-field>
 
-      <button mat-stroked-button (click)="clearDateFilter()">
+      <button mat-stroked-button type="button" (click)="clearDateFilter()">
         <mat-icon>today</mat-icon> Reset to Today
       </button>
 
@@ -56,20 +56,24 @@
             </mat-panel-title>
             
             <mat-panel-description class="alert-meta">
-              <mat-chip-option disabled class="type-chip">
-                {{ getEventTypeLabel(alert.eventType) }}
-              </mat-chip-option>
+              <mat-chip-set>
+                <mat-chip class="type-chip">
+                  {{ getEventTypeLabel(alert.eventType) }}
+                </mat-chip>
+              </mat-chip-set>
+
               <span class="timestamp">{{ alert.createdAt | date:'short' }}</span>
 
               <!-- Quick Item Actions -->
               <div class="panel-actions">
-                <button mat-icon-button [color]="alert.status === 'active' ? 'accent' : 'warn'"
+                <button mat-icon-button type="button"
+                        [color]="alert.status === 'active' ? 'accent' : 'warn'"
                         (click)="toggleAlertStatus(alert.id, $event)"
                         [attr.title]="alert.status === 'active' ? 'Deactivate' : 'Activate'">
                   <mat-icon>{{ alert.status === 'active' ? 'pause_circle' : 'play_circle' }}</mat-icon>
                 </button>
 
-                <button mat-icon-button color="warn" (click)="deleteAlert(alert.id, $event)" title="Delete Alert">
+                <button mat-icon-button type="button" color="warn" (click)="deleteAlert(alert.id, $event)" title="Delete Alert">
                   <mat-icon>delete</mat-icon>
                 </button>
               </div>

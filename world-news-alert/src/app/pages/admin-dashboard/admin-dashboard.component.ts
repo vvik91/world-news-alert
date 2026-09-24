@@ -135,4 +135,9 @@ export class AdminDashboardComponent {
     const found = this.eventTypes().find(t => t.id === typeId);
     return found ? found.label : typeId;
   }
+
+  resetDateToToday(): void {
+    this.selectedDate.set(new Date());
+    this.pageIndex.set(0);
+  }
 }

@@ -30,7 +30,8 @@
               }
             ],
             "styles": [
-              "src/styles.sass"
+              "src/styles.sass",
+              "@angular/material/prebuilt-themes/indigo-pink.css"
             ]
           },
           "configurations": {
